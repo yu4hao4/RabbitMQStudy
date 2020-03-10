@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/rabbit
+       http://www.springframework.org/schema/rabbit/spring-rabbit-1.7.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+<!--    1.定义 rabbitmq 连接工厂-->
+    <rabbit:connection-factory id="connectionFactory"
+       host="121.36.49.252" port="5672" username="user" password="user"
+       virtual-host="/vhost_like_db" />
+
+<!--    2.定义 rabbitmq 模板，指定连接工厂以及定义 exchange -->
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory"
+                     exchange="fanoutExchange"/>
+<!--    MQ 的管理，包括队列、交换器 声明等-->
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+
+<!--    定义队列，自动声明-->
+    <rabbit:queue name="myQueue" auto-declare="true" durable="true"/>
+
+<!--    定义交换器，自动声明-->
+    <rabbit:fanout-exchange name="fanoutExchange" auto-declare="true">
+        <rabbit:bindings>
+            <rabbit:binding queue="myQueue"/>
+        </rabbit:bindings>
+    </rabbit:fanout-exchange>
+
+<!--    队列监听-->
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener ref="foo" method="listen" queue-names="myQueue"/>
+    </rabbit:listener-container>
+
+<!--    消费者-->
+    <bean id="foo" class="cn.spring.MyConsumer"/>
+
+</beans>
