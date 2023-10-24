@@ -18,7 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <slf4j-log4j12.version>1.7.25</slf4j-log4j12.version>
-        <rabbitmq.version>5.7.3</rabbitmq.version>
+        <rabbitmq.version>5.18.0</rabbitmq.version>
     </properties>
 
     <dependencies>
